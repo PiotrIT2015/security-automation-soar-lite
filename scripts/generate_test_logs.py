@@ -1,0 +1,39 @@
+from pathlib import Path
+
+
+LOGS = [
+    "Nov 13 10:15:22 ubuntu sshd[1234]: Failed password for root from 192.0.2.10 port 52341 ssh2",
+
+    "Nov 13 10:15:25 ubuntu sshd[1235]: Failed password for root from 192.0.2.10 port 52342 ssh2",
+
+    "Nov 13 10:15:30 ubuntu sshd[1236]: Failed password for admin from 198.51.100.20 port 52343 ssh2",
+
+    "Nov 13 10:16:10 ubuntu sshd[1240]: Accepted publickey for piotr from 192.0.2.50 port 52344 ssh2",
+
+    "Nov 13 10:17:10 ubuntu sshd[1245]: Invalid user test from 203.0.113.15 port 52345",
+
+    "Nov 13 10:18:00 ubuntu sudo: piotr : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
+]
+
+
+def generate_logs():
+
+    output = Path("data/raw/linux/auth.log")
+
+    output.parent.mkdir(
+        parents=True,
+        exist_ok=True
+    )
+
+    output.write_text(
+        "\n".join(LOGS),
+        encoding="utf-8"
+    )
+
+    print(f"[+] Generated {len(LOGS)} test log entries")
+
+    print(f"[+] Output: {output}")
+
+
+if __name__ == "__main__":
+    generate_logs()
