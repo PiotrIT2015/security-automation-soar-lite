@@ -1,0 +1,41 @@
+# ==========================================
+# SOAR LITE - DETECTION RULES
+# ==========================================
+
+detection:
+
+  brute_force:
+    enabled: true
+    threshold: 5
+    score: 30
+    description: "Multiple failed login attempts from one IP"
+
+  multiple_accounts:
+    enabled: true
+    threshold: 3
+    score: 15
+    description: "Attempts to access multiple user accounts"
+
+  abuseipdb:
+    enabled: true
+    threshold: 80
+    score: 30
+    description: "IP has high AbuseIPDB confidence score"
+
+  virustotal:
+    enabled: true
+    threshold: 1
+    score: 25
+    description: "IP detected as malicious by VirusTotal"
+
+
+# ==========================================
+# THREAT CLASSIFICATION
+# ==========================================
+
+severity:
+
+  critical: 80
+  high: 60
+  medium: 30
+  low: 0

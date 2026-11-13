@@ -2,7 +2,11 @@ import json
 import time
 import ipaddress
 
+from datetime import datetime, timezone
+
 from pathlib import Path
+
+from src.analyzers.detection_engine import DetectionEngine
 
 from src.collectors.log_collector import LogCollector
 from src.parsers.linux_parser import LinuxParser
@@ -215,6 +219,86 @@ def main():
         )
 
     # ------------------------------------------------
+    # 8. THREAT DETECTION & SCORING
+    # ------------------------------------------------
+
+    print("\n[+] Starting Threat Detection Engine...")
+
+    detection_engine = DetectionEngine()
+
+    detections = detection_engine.analyze(
+        events,
+        enriched_iocs
+    )
+
+    print("\n[+] THREAT ANALYSIS RESULTS")
+
+    for detection in detections:
+
+        print("\n--------------------------------")
+
+        print(f"IP: {detection['ip']}")
+
+        print(
+            f"Threat Score: "
+            f"{detection['threat_score']}/100"
+        )
+
+        print(
+            f"Severity: "
+            f"{detection['severity']}"
+        )
+
+        if detection["triggered_rules"]:
+
+            print("Triggered rules:")
+
+            for rule in detection["triggered_rules"]:
+
+                print(
+                    f"  [+] {rule['rule']} "
+                    f"(+{rule['score']})"
+                )
+
+        else:
+
+            print("[-] No detection rules triggered")
+
+    # ------------------------------------------------
+    # 9. DETECTION SUMMARY
+    # ------------------------------------------------
+
+    summary = {
+
+        "critical": sum(
+            item["severity"] == "CRITICAL"
+            for item in detections
+        ),
+
+        "high": sum(
+            item["severity"] == "HIGH"
+            for item in detections
+        ),
+
+        "medium": sum(
+            item["severity"] == "MEDIUM"
+            for item in detections
+        ),
+
+        "low": sum(
+            item["severity"] == "LOW"
+            for item in detections
+        )
+
+    }
+
+    print("\n[+] DETECTION SUMMARY")
+
+    for severity, count in summary.items():
+
+        print(f"    {severity.upper()}: {count}")
+
+    # ------------------------------------------------
     # 8. GENERATE JSON REPORT
     # ------------------------------------------------
 
@@ -237,6 +321,10 @@ def main():
         "iocs": iocs,
 
         "enriched_iocs": enriched_iocs,
+        
+        "detections": detections,
+        
+        "detection_summary": summary,
 
         "events": events
 
