@@ -39,3 +39,63 @@ severity:
   high: 60
   medium: 30
   low: 0
+  
+# ==========================================
+# SOAR LITE - RESPONSE RULES
+# ==========================================
+
+incident_management:
+
+  minimum_severity: MEDIUM
+
+  auto_create_incidents: true
+
+  generate_incident_id: true
+
+
+# ==========================================
+# ALERT CONFIGURATION
+# ==========================================
+
+alerts:
+
+  enabled: true
+
+  notify_on:
+
+    - MEDIUM
+    - HIGH
+    - CRITICAL
+
+
+# ==========================================
+# AUTOMATED RESPONSE
+# ==========================================
+
+response:
+
+  enabled: true
+
+  simulation_mode: true
+
+  require_approval: true
+
+  actions:
+
+    LOW:
+      - LOG_EVENT
+
+    MEDIUM:
+      - CREATE_ALERT
+      - COLLECT_EVIDENCE
+
+    HIGH:
+      - CREATE_ALERT
+      - COLLECT_EVIDENCE
+      - REQUEST_IP_BLOCK
+
+    CRITICAL:
+      - CREATE_ALERT
+      - COLLECT_EVIDENCE
+      - REQUEST_IP_BLOCK
+      - ESCALATE_TO_ANALYST

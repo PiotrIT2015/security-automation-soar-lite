@@ -1,19 +1,21 @@
+
 import json
 import time
 import ipaddress
 
-from datetime import datetime, timezone
-
 from pathlib import Path
-
-from src.analyzers.detection_engine import DetectionEngine
 
 from src.collectors.log_collector import LogCollector
 from src.parsers.linux_parser import LinuxParser
 from src.analyzers.ioc_extractor import IOCExtractor
+from src.analyzers.detection_engine import DetectionEngine
 
 from src.integrations.virustotal import VirusTotalClient
 from src.integrations.abuseipdb import AbuseIPDBClient
+
+from src.response.incident_manager import IncidentManager
+from src.response.alert_manager import AlertManager
+from src.response.response_engine import ResponseEngine
 
 
 # ==================================================
@@ -104,8 +106,6 @@ def main():
 
     enriched_iocs = []
 
-    # Select only globally routable IP addresses.
-
     public_iocs = []
 
     for ioc in iocs:
@@ -113,7 +113,6 @@ def main():
         ip = ioc["ip"]
 
         try:
-
             address = ipaddress.ip_address(ip)
 
         except ValueError:
@@ -177,11 +176,14 @@ def main():
                 f"{vt_result.get('status')}"
             )
 
-            # Rate limiting between VirusTotal requests.
+            # Rate limiting between VirusTotal requests
 
             if index < len(public_iocs) - 1:
 
-                print("[*] Waiting 15 seconds...")
+                print(
+                    f"[*] Waiting "
+                    f"{VT_REQUEST_INTERVAL} seconds..."
+                )
 
                 time.sleep(VT_REQUEST_INTERVAL)
 
@@ -196,7 +198,7 @@ def main():
                 f"{abuse_result.get('status')}"
             )
 
-            # Store enriched IOC.
+            # Store enriched IOC
 
             enriched_iocs.append({
 
@@ -299,7 +301,56 @@ def main():
         print(f"    {severity.upper()}: {count}")
 
     # ------------------------------------------------
-    # 8. GENERATE JSON REPORT
+    # 10. INCIDENT MANAGEMENT
+    # ------------------------------------------------
+
+    print("\n[+] Starting Incident Manager...")
+
+    incident_manager = IncidentManager()
+
+    incidents = incident_manager.process_detections(
+        detections,
+        minimum_severity="MEDIUM"
+    )
+
+    print(
+        f"[+] New incidents created: {len(incidents)}"
+    )
+
+    # ------------------------------------------------
+    # 11. ALERT MANAGEMENT
+    # ------------------------------------------------
+
+    print("\n[+] Starting Alert Manager...")
+
+    alert_manager = AlertManager()
+
+    alerts = alert_manager.process_incidents(
+        incidents
+    )
+
+    print(
+        f"[+] Alerts generated: {len(alerts)}"
+    )
+
+    # ------------------------------------------------
+    # 12. AUTOMATED RESPONSE
+    # ------------------------------------------------
+
+    print("\n[+] Starting Response Engine...")
+
+    response_engine = ResponseEngine()
+
+    responses = response_engine.process_incidents(
+        incidents
+    )
+
+    print(
+        f"[+] Response simulations: {len(responses)}"
+    )
+
+    # ------------------------------------------------
+    # 13. GENERATE JSON REPORT
     # ------------------------------------------------
 
     report = {
@@ -321,10 +372,22 @@ def main():
         "iocs": iocs,
 
         "enriched_iocs": enriched_iocs,
-        
+
         "detections": detections,
-        
+
         "detection_summary": summary,
+
+        "incident_management": {
+
+            "total_new_incidents": len(incidents),
+
+            "incidents": incidents
+
+        },
+
+        "alerts": alerts,
+
+        "automated_responses": responses,
 
         "events": events
 
