@@ -40,3 +40,17 @@ pip install -r requirements.txt
 python -m src.main
 python -m streamlit run dashboard/app
 ```
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-1.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-2.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-3.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-4.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-5.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-6.jpg?raw=true)
+
+![image alt](https://github.com/PiotrIT2015/security-automation-soar-lite/blob/master/screenshot-7.jpg?raw=true)
